@@ -1,1 +1,1 @@
-FROM cuteboibutt/team_3_stuff:devcontainer_with_deps
+FROM ghcr.io/cuteboibutt/chat/devcontainer:latest

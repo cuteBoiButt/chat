@@ -11,24 +11,11 @@
   "supports": "!uwp & !xbox",
   "dependencies": [
     {
-      "name": "cairo",
-      "default-features": false,
-      "platform": "!windows & !osx & !ios"
-    },
-    {
       "name": "curl",
       "default-features": false,
       "platform": "!windows & !osx"
     },
     "expat",
-    {
-      "name": "gtk3",
-      "platform": "!windows & !osx & !ios"
-    },
-    {
-      "name": "libiconv",
-      "platform": "!windows"
-    },
     "libjpeg-turbo",
     "libpng",
     "nanosvg",
@@ -63,17 +50,7 @@
       "description": "Example source code and CMake project"
     },
     "fonts": {
-      "description": "Enable to use the font functionality of wxWidgets",
-      "dependencies": [
-        {
-          "name": "fontconfig",
-          "platform": "!windows & !osx"
-        },
-        {
-          "name": "pango",
-          "platform": "!windows & !osx"
-        }
-      ]
+      "description": "Enable to use the font functionality of wxWidgets"
     },
     "media": {
       "description": "Build wxMediaCtrl support",

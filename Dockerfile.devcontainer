@@ -1,0 +1,85 @@
+FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04 AS builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y \
+    mono-complete bison flex autoconf libltdl-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev \
+    libgtk-3-dev libglib2.0-dev
+
+COPY . .
+
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+ARG GITHUB_REPOSITORY_OWNER
+
+RUN --mount=type=secret,id=nuget_token \
+    NUGET_TOKEN=$(cat /run/secrets/nuget_token) && \
+    NUGET_EXE_PATH=$(./vcpkg/vcpkg fetch nuget | tail -n 1 | tr -d '\r') && \
+    mono "$NUGET_EXE_PATH" sources add -Source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json" -StorePasswordInClearText -Name GitHubPackages -UserName "github" -Password "${NUGET_TOKEN}" && \
+    mono "$NUGET_EXE_PATH" setapikey "${NUGET_TOKEN}" -Source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
+
+ENV VCPKG_BINARY_SOURCES="clear;nuget,https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json,readwrite"
+
+# Configure cmake project to install packages, ignore errors cuz we dont have qt yet
+RUN cmake --preset ninja-multi-vcpkg || true
+
+RUN python3 ./scripts/relink_shared_libs.py ./vcpkg/packages --verbose
+RUN ./scripts/strip_vcpkg_debug_symbols.sh ./vcpkg/packages
+RUN python3 ./scripts/create_vcpkg_cache.py -p ./vcpkg/packages -c ./vcpkg-archives
+
+# Final image
+FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+
+# Avoid prompts from apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Qt dependencies (from official Qt documentation)
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-venv \
+    libxkbcommon-dev \
+    libxrandr-dev \
+    libxtst-dev \
+    libgl1-mesa-dev \
+    libfontconfig1-dev \
+    libfreetype-dev \
+    libdbus-1-dev \
+    libxkbcommon-x11-0 \
+    libxcb-icccm4 \
+    libxcb-keysyms1 \
+    libxcb-shape0 \
+    libxcb-xkb1 \
+    libgtk-3-dev \
+    libglib2.0-dev \
+    unixodbc \
+    libxcb-cursor0 \
+    file \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install aqtinstall for Qt installation using pipx
+RUN pip3 install --break-system-packages pipx \
+    && pipx install aqtinstall \
+    && pipx ensurepath
+
+# Set Qt version
+ARG QT_VERSION=6.10.0
+ARG QT_ARCH=gcc_64
+
+# Install Qt
+RUN /root/.local/bin/aqt install-qt linux desktop ${QT_VERSION} linux_${QT_ARCH} \
+    --outputdir /opt/Qt
+
+# Set Qt environment variables
+ENV Qt6_DIR=/opt/Qt/${QT_VERSION}/${QT_ARCH}
+ENV PATH="${Qt6_DIR}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${Qt6_DIR}/lib:${LD_LIBRARY_PATH}"
+ENV PKG_CONFIG_PATH="${Qt6_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+ENV QT_PLUGIN_PATH="${Qt6_DIR}/plugins"
+ENV QML2_IMPORT_PATH="${Qt6_DIR}/qml"
+
+# Copy vcpkg binary cache
+COPY --chown=vscode:vscode --from=builder /workspace/vcpkg-archives /home/vscode/.cache/vcpkg/archives
+
+WORKDIR /workspace
