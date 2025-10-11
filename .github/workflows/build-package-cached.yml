@@ -46,7 +46,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y mono-complete doxygen graphviz clang bison flex autoconf libltdl-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev
+          sudo apt-get install -y mono-complete doxygen graphviz clang bison flex sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libegl1-mesa-dev libtool autoconf automake autoconf-archive libltdl-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev
 
       - name: Configure NuGet credentials using vcpkg's nuget.exe
         shell: bash
@@ -94,7 +94,6 @@ jobs:
       - name: Create AppImage on Linux
         if: runner.os == 'Linux'
         run: |
-          ls -la ./vcpkg/packages
           cd build
           cmake --install . --config Release --component client --prefix ./AppDir/usr/bin
 
@@ -288,5 +287,6 @@ jobs:
             --notes "$NOTES" \
             --latest \
             final_releases/*
+
 
 
