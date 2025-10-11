@@ -15,7 +15,10 @@
     "DISPLAY": "${env:DISPLAY}",
     "XAUTHORITY": "/tmp/.Xauthority-container",
     "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:log_path=/tmp/asan.log",
-    "TSAN_OPTIONS": "halt_on_error=1:log_path=/tmp/tsan.log:report_atomic_races=0"
+    "TSAN_OPTIONS": "halt_on_error=1:log_path=/tmp/tsan.log:report_atomic_races=0",
+    "VCPKG_TARGET_TRIPLET": "x64-linux-mixed-explicit",
+    "VCPKG_DEFAULT_TRIPLET": "x64-linux-mixed-explicit",
+    "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-mixed-explicit"
   },
 
   "customizations": {

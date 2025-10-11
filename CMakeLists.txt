@@ -57,6 +57,7 @@ endif()
 
 if(BUILD_CLIENT)
     add_subdirectory(client)
+    add_subdirectory(client/qt)
 endif()
 
 # Include LICENSE
