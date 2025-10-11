@@ -1,25 +1,33 @@
 {
   "name": "slightly-pretty-chat",
   "version-string": "0.0.7",
+  "builtin-baseline": "ce613c41372b23b1f51333815feb3edd87ef8a8b",
   "dependencies": [
+    "ada-idna",
+    "ada-url",
+    "argon2",
     {
       "name": "drogon",
-      "features": ["ctl","orm","postgres"]
+      "features": [
+        "ctl",
+        "orm",
+        "postgres"
+      ]
     },
     "protobuf",
-    "argon2",
-    "ada-url",
-    "ada-idna"
+    "qtbase"
   ],
   "features": {
     "client": {
       "description": "Dependencies for the client component",
-      "dependencies": [ {
-        "name": "wxwidgets",
-        "features": ["fonts"]
-      }
-    ]
+      "dependencies": [
+        {
+          "name": "wxwidgets",
+          "features": [
+            "fonts"
+          ]
+        }
+      ]
     }
-  },
-  "builtin-baseline": "ce613c41372b23b1f51333815feb3edd87ef8a8b"
+  }
 }
