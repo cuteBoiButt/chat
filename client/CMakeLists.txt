@@ -3,6 +3,8 @@ project(SlightlyPrettyChatClient LANGUAGES CXX)
 
 find_package(wxWidgets CONFIG REQUIRED)
 
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
 add_executable(client_app
     src/main.cpp
     src/graphicsContextManager.cpp

@@ -1,0 +1,83 @@
+FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04 AS builder
+
+WORKDIR /workspace
+COPY . .
+
+RUN ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+RUN apt-get update
+RUN apt-get install -y mono-complete doxygen graphviz clang bison flex '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libegl1-mesa-dev libtool autoconf automake autoconf-archive libltdl-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev
+
+RUN --mount=type=secret,id=github_token \
+    --mount=type=secret,id=github_owner \
+    GITHUB_TOKEN=$(cat /run/secrets/github_token) && \
+    GITHUB_REPOSITORY_OWNER=$(cat /run/secrets/github_owner) && \
+    NUGET_EXE_PATH=$(./vcpkg/vcpkg fetch nuget | tail -n 1 | tr -d '\r') && \
+    mono "$NUGET_EXE_PATH" sources add -Source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json" -StorePasswordInClearText -Name GitHubPackages -UserName "${GITHUB_REPOSITORY_OWNER}" -Password "${GITHUB_TOKEN}" && \
+    mono "$NUGET_EXE_PATH" setapikey "${GITHUB_TOKEN}" -Source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
+
+    # Run CMake configure to populate vcpkg packages
+RUN cmake --preset ninja-multi-vcpkg
+
+# Final image
+FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
+
+# Avoid prompts from apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Qt dependencies (from official Qt documentation)
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-venv \
+    libfontconfig1-dev \
+    libfreetype-dev \
+    libx11-dev \
+    libx11-xcb-dev \
+    libxcb-cursor-dev \
+    libxcb-glx0-dev \
+    libxcb-icccm4-dev \
+    libxcb-image0-dev \
+    libxcb-keysyms1-dev \
+    libxcb-randr0-dev \
+    libxcb-render-util0-dev \
+    libxcb-shape0-dev \
+    libxcb-shm0-dev \
+    libxcb-sync-dev \
+    libxcb-util-dev \
+    libxcb-xfixes0-dev \
+    libxcb-xkb-dev \
+    libxcb1-dev \
+    libxext-dev \
+    libxfixes-dev \
+    libxi-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install aqtinstall for Qt installation using pipx
+RUN pip3 install --break-system-packages pipx \
+    && pipx install aqtinstall
+
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Set Qt version
+ARG QT_VERSION=6.10.0
+ARG QT_ARCH=linux_gcc_64
+
+# Install Qt
+RUN aqt install-qt linux desktop ${QT_VERSION} ${QT_ARCH} \
+    --outputdir /opt/Qt
+
+# Set Qt environment variables
+ENV Qt6_DIR=/opt/Qt/${QT_VERSION}/${QT_ARCH}
+ENV PATH="${Qt6_DIR}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${Qt6_DIR}/lib:${LD_LIBRARY_PATH}"
+ENV PKG_CONFIG_PATH="${Qt6_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+ENV QT_PLUGIN_PATH="${Qt6_DIR}/plugins"
+ENV QML_IMPORT_PATH="${Qt6_DIR}/qml"
+
+# Copy vcpkg packages from builder stage
+COPY --from=builder /workspace/vcpkg/packages /opt/vcpkg-packages
+
+WORKDIR /workspace

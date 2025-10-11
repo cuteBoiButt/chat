@@ -24,6 +24,9 @@ jobs:
       id-token: write
       attestations: write
 
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,18 +65,20 @@ jobs:
 
           echo "Configuring NuGet source..."
           # Add the source with credentials, as per the documentation
-          $CMD_PREFIX "$NUGET_EXE_PATH" sources add \
-            -Name "github" \
+          $CMD_PREFIX "$NUGET_EXE_PATH" \
+            sources add \
             -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            -UserName "GITHUB_TOKEN" \
-            -Password "${{ secrets.GITHUB_TOKEN }}" \
-            -StorePasswordInClearText
+            -StorePasswordInClearText \
+            -Name GitHubPackages \
+            -UserName "${{ github.repository_owner }}" \
+            -Password "${{ secrets.GITHUB_TOKEN }}"
 
           echo "Setting API key..."
           # Set the API key for the source to ensure push access
-          $CMD_PREFIX "$NUGET_EXE_PATH" setapikey "${{ secrets.GITHUB_TOKEN }}" \
+          $CMD_PREFIX "$NUGET_EXE_PATH" \
+            setapikey "${{ secrets.GITHUB_TOKEN }}" \
             -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-  
+
       - name: Set vcpkg binary sources environment variable
         shell: bash
         run: |
