@@ -94,6 +94,7 @@ jobs:
       - name: Create AppImage on Linux
         if: runner.os == 'Linux'
         run: |
+          ls -la ~/.cache/vcpkg/archives
           cd build
           cmake --install . --config Release --component client --prefix ./AppDir/usr/bin
 
@@ -287,3 +288,4 @@ jobs:
             --notes "$NOTES" \
             --latest \
             final_releases/*
+
