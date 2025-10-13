@@ -19,6 +19,7 @@ set(VCPKG_LINKER_FLAGS_RELEASE "${VCPKG_LINKER_FLAGS_RELEASE} -flto")
 #    (Generated from license analysis)
 set(STATICALLY_LINKED_PORTS
     abseil
+    ada-idna
     ada-url
     argon2
     brotli
