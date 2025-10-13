@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /workspace
 
 RUN apt-get update && apt-get install -y \
-    mono-complete
+    mono-complete bison flex
 
 COPY . .
 
@@ -20,13 +20,12 @@ RUN --mount=type=secret,id=nuget_token \
     mono "$NUGET_EXE_PATH" setapikey "${NUGET_TOKEN}" -Source "https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json"
 
 ENV VCPKG_BINARY_SOURCES="clear;nuget,https://nuget.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/index.json,readwrite"
-ENV VCPKG_TARGET_TRIPLET="x64-linux-dynamic"
+ENV VCPKG_TARGET_TRIPLET="x64-linux-mixed-explicit"
+ENV VCPKG_DEFAULT_TRIPLET="x64-linux-mixed-explicit"
+ENV VCPKG_DEFAULT_HOST_TRIPLET="x64-linux-mixed-explicit"
 
 # Configure cmake project to install packages, ignore errors cuz we dont have qt yet
-RUN export VCPKG_TARGET_TRIPLET="x64-linux-mixed-explicit" && \
-    export VCPKG_DEFAULT_TRIPLET="x64-linux-mixed-explicit" && \
-    export VCPKG_DEFAULT_HOST_TRIPLET="x64-linux-mixed-explicit" && \
-    cmake --preset ninja-multi-vcpkg || true
+RUN cmake --preset ninja-multi-vcpkg || true
 
 RUN python3 ./scripts/create_vcpkg_cache.py -p ./vcpkg/packages -c ./vcpkg-archives
 
