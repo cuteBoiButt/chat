@@ -16,11 +16,7 @@
 			"cacheVariables": {
                 "VCPKG_MANIFEST_FEATURES": "client",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "VCPKG_INSTALL_OPTIONS": "--clean-buildtrees-after-build",
-                "VCPKG_TARGET_TRIPLET": {
-                    "type": "STRING",
-                    "value": "$env{VCPKG_TARGET_TRIPLET}"
-                }
+                "VCPKG_INSTALL_OPTIONS": "--clean-buildtrees-after-build"
 			}
         }
     ],
