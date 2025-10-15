@@ -15,7 +15,7 @@ set(VCPKG_C_FLAGS_RELEASE "${VCPKG_C_FLAGS_RELEASE} -flto")
 # Linker Flags for Release
 set(VCPKG_LINKER_FLAGS_RELEASE "${VCPKG_LINKER_FLAGS_RELEASE} -flto")
 
-# 1. Define the list of ports that should be linked STATICALLY
+# 1. Define the list of ports that should be linked statically
 #    (Generated from license analysis)
 set(STATICALLY_LINKED_PORTS
     abseil

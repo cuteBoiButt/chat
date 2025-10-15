@@ -74,7 +74,21 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
                 file_path = Path(root) / file
                 # Store paths relative to package directory
                 arcname = file_path.relative_to(package_dir)
-                zipf.write(file_path, arcname)
+                if file_path.is_symlink():
+                    # 1. Create a ZipInfo object for the symlink
+                    zip_info = zipfile.ZipInfo(str(arcname))
+                    
+                    # 2. Set the file attributes to identify it as a symlink
+                    zip_info.external_attr = (stat.S_IFLNK | 0o777) << 16
+                    
+                    # 3. Read the link's target path
+                    link_target = os.readlink(file_path)
+                    
+                    # 4. Write the link target as the "content" of the symlink
+                    zipf.writestr(zip_info, link_target)
+                else:
+                    # This is a regular file, write it normally
+                    zipf.write(file_path, arcname)
     
     size_mb = output_zip.stat().st_size / 1024 / 1024
     print(f"  Created: {output_zip.relative_to(output_zip.parent.parent)} ({size_mb:.2f} MB)")
