@@ -181,10 +181,17 @@ hashes, and existing symlink targets. Greatly helps in debugging."""
 
     for package_name in sorted(package_dirs):
         package_path = os.path.join(args.packages_root, package_name)
-        lib_path = os.path.join(package_path, 'lib')
+        
+        # Define the list of potential library directories to check for each package
+        potential_lib_dirs = [
+            os.path.join(package_path, 'lib'),
+            os.path.join(package_path, 'debug', 'lib')
+        ]
 
-        if os.path.isdir(lib_path):
-            process_lib_directory(lib_path, args.dry_run, args.verbose)
+        for lib_path in potential_lib_dirs:
+            if os.path.isdir(lib_path):
+                # If the directory exists, process it
+                process_lib_directory(lib_path, args.dry_run, args.verbose)
 
     print("\n\n=== Script finished. ===")
 
