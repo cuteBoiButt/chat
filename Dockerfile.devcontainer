@@ -24,7 +24,7 @@ ENV VCPKG_BINARY_SOURCES="clear;nuget,https://nuget.pkg.github.com/${GITHUB_REPO
 # Configure cmake project to install packages, ignore errors cuz we dont have qt yet
 RUN cmake --preset ninja-multi-vcpkg || true
 
-RUN python3 ./scripts/relink_shared_libs.py ./vcpkg/packages
+RUN python3 ./scripts/relink_shared_libs.py ./vcpkg/packages --verbose
 RUN python3 ./scripts/create_vcpkg_cache.py -p ./vcpkg/packages -c ./vcpkg-archives
 
 # Final image
