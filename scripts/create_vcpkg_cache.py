@@ -77,6 +77,7 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
             # 2. It ensures that empty directories are explicitly added to the archive.
             for dir_name in dirs:
                 dir_path = Path(root) / dir_name
+                # Store paths relative to package directory
                 arcname = dir_path.relative_to(package_dir)
                 zip_info = zipfile.ZipInfo(f"{arcname}/")
                 zip_info.external_attr = dir_path.lstat().st_mode << 16
@@ -84,16 +85,6 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
 
             for file in files:
                 file_path = Path(root) / file
-
-                # Filter out unversioned or multi-versioned shared libraries.
-
-                is_shared_lib_variant = ".so." in file or file.endswith(".so")
-
-                if is_shared_lib_variant and not re.search(r'\.so\.\d+$', file):
-                    # This file is a shared library but does not match the
-                    # desired `*.so.{number}` pattern. Skip it.
-                    continue
-
                 # Store paths relative to package directory
                 arcname = file_path.relative_to(package_dir)
                 if file_path.is_symlink():
