@@ -19,7 +19,7 @@ import zipfile
 import hashlib
 from pathlib import Path
 import argparse
-
+import re
 
 def find_abi_hash(package_dir: Path) -> tuple[str, str]:
     """
@@ -84,6 +84,16 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
 
             for file in files:
                 file_path = Path(root) / file
+
+                # Filter out unversioned or multi-versioned shared libraries.
+
+                is_shared_lib_variant = ".so." in file or file.endswith(".so")
+
+                if is_shared_lib_variant and not re.search(r'\.so\.\d+$', file):
+                    # This file is a shared library but does not match the
+                    # desired `*.so.{number}` pattern. Skip it.
+                    continue
+
                 # Store paths relative to package directory
                 arcname = file_path.relative_to(package_dir)
                 if file_path.is_symlink():
