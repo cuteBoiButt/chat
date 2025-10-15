@@ -44,5 +44,3 @@ jobs:
             "nuget_token=${{ secrets.NUGET_TOKEN }}"
           push: true
           tags: ghcr.io/${{ steps.repo.outputs.owner }}/${{ steps.repo.outputs.name }}/devcontainer:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
