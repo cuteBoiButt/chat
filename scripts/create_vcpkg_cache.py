@@ -69,7 +69,19 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
     print(f"  Compressing {package_dir.name}...")
     
     with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(package_dir):
+        # Add 'followlinks=False' so os.walk reports symlinks instead of following them.
+        for root, dirs, files in os.walk(package_dir, followlinks=False):
+            
+            # This loop is critical for two reasons:
+            # 1. It preserves the original permissions of every directory.
+            # 2. It ensures that empty directories are explicitly added to the archive.
+            for dir_name in dirs:
+                dir_path = Path(root) / dir_name
+                arcname = dir_path.relative_to(package_dir)
+                zip_info = zipfile.ZipInfo(f"{arcname}/")
+                zip_info.external_attr = dir_path.lstat().st_mode << 16
+                zipf.writestr(zip_info, "")
+
             for file in files:
                 file_path = Path(root) / file
                 # Store paths relative to package directory
@@ -78,8 +90,8 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
                     # 1. Create a ZipInfo object for the symlink
                     zip_info = zipfile.ZipInfo(str(arcname))
                     
-                    # 2. Set the file attributes to identify it as a symlink
-                    zip_info.external_attr = (stat.S_IFLNK | 0o777) << 16
+                    # 2. Set the file attributes by reading the symlink's actual permissions.
+                    zip_info.external_attr = file_path.lstat().st_mode << 16
                     
                     # 3. Read the link's target path
                     link_target = os.readlink(file_path)
@@ -87,8 +99,12 @@ def compress_package_to_zip(package_dir: Path, output_zip: Path) -> None:
                     # 4. Write the link target as the "content" of the symlink
                     zipf.writestr(zip_info, link_target)
                 else:
-                    # This is a regular file, write it normally
-                    zipf.write(file_path, arcname)
+                    # This is a regular file. We must explicitly read its permissions
+                    # and content to ensure they are preserved.
+                    zip_info = zipfile.ZipInfo(str(arcname))
+                    zip_info.external_attr = file_path.lstat().st_mode << 16
+                    with open(file_path, 'rb') as f:
+                        zipf.writestr(zip_info, f.read())
     
     size_mb = output_zip.stat().st_size / 1024 / 1024
     print(f"  Created: {output_zip.relative_to(output_zip.parent.parent)} ({size_mb:.2f} MB)")
