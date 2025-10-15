@@ -25,6 +25,7 @@ ENV VCPKG_BINARY_SOURCES="clear;nuget,https://nuget.pkg.github.com/${GITHUB_REPO
 RUN cmake --preset ninja-multi-vcpkg || true
 
 RUN python3 ./scripts/relink_shared_libs.py ./vcpkg/packages --verbose
+RUN ./scripts/strip_vcpkg_debug_symbols.sh ./vcpkg/packages
 RUN python3 ./scripts/create_vcpkg_cache.py -p ./vcpkg/packages -c ./vcpkg-archives
 
 # Final image
