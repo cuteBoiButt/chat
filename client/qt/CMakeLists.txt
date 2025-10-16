@@ -59,3 +59,11 @@ install(
     COMPONENT qt_client
 )
 
+if(WIN32)
+    # The Windows fixup is needed because vcpkg defaults to
+    # dynamic linking.
+    install(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/qt_client_app.exe\" \"\" \"$<TARGET_FILE_DIR:qt_client_app>\")
+    " COMPONENT qt_client)
+endif()
