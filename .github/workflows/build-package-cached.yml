@@ -46,7 +46,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y mono-complete doxygen graphviz clang bison flex autoconf libltdl-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev
+          sudo apt-get install -y mono-complete doxygen graphviz clang bison flex autoconf libltdl-dev libarchive-dev python3-jinja2 libx11-dev libxft-dev libxext-dev libxi-dev libxtst-dev libxrandr-dev libgtk-3-dev libglib2.0-dev
 
       - name: Configure NuGet credentials using vcpkg's nuget.exe
         shell: bash
