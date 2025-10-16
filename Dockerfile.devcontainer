@@ -53,6 +53,7 @@ RUN apt-get update && apt-get install -y \
     libxcb-xkb1 \
     libgtk-3-dev \
     libglib2.0-dev \
+    unixodbc \
     && rm -rf /var/lib/apt/lists/*
 
 # Install aqtinstall for Qt installation using pipx
@@ -70,7 +71,7 @@ RUN /root/.local/bin/aqt install-qt linux desktop ${QT_VERSION} linux_${QT_ARCH}
 
 # Set Qt environment variables
 ENV Qt6_DIR=/opt/Qt/${QT_VERSION}/${QT_ARCH}
-#ENV PATH="${Qt6_DIR}/bin:${PATH}"
+ENV PATH="${Qt6_DIR}/bin:${PATH}"
 ENV LD_LIBRARY_PATH="${Qt6_DIR}/lib:${LD_LIBRARY_PATH}"
 ENV PKG_CONFIG_PATH="${Qt6_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
 ENV QT_PLUGIN_PATH="${Qt6_DIR}/plugins"
