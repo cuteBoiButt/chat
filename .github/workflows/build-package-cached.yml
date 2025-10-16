@@ -65,13 +65,13 @@ jobs:
           $CMD_PREFIX "$NUGET_EXE_PATH" sources add \
             -Name "github" \
             -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-            -UserName "GITHUB_TOKEN" \
-            -Password "${{ secrets.GITHUB_TOKEN }}" \
+            -UserName "github" \
+            -Password "${{ secrets.NUGET_TOKEN }}" \
             -StorePasswordInClearText
 
           echo "Setting API key..."
           # Set the API key for the source to ensure push access
-          $CMD_PREFIX "$NUGET_EXE_PATH" setapikey "${{ secrets.GITHUB_TOKEN }}" \
+          $CMD_PREFIX "$NUGET_EXE_PATH" setapikey "${{ secrets.NUGET_TOKEN }}" \
             -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
   
       - name: Set vcpkg binary sources environment variable
