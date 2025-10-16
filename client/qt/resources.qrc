@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/panel.qml</file>
+        <file>forms/mainwindow.ui</file>
+        <file>forms/connectwidget.ui</file>
+        <file>forms/loginscreen.ui</file>
+    </qresource>
+</RCC>

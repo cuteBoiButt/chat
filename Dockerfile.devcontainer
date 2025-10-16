@@ -54,6 +54,8 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-dev \
     libglib2.0-dev \
     unixodbc \
+    libxcb-cursor0 \
+    file \
     && rm -rf /var/lib/apt/lists/*
 
 # Install aqtinstall for Qt installation using pipx
