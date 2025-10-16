@@ -60,10 +60,18 @@ install(
 )
 
 if(WIN32)
-    # The Windows fixup is needed because vcpkg defaults to
-    # dynamic linking.
+    # Find windeployqt
+    get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" DIRECTORY)
+    set(WINDEPLOYQT_EXECUTABLE "${QT_BIN_DIR}/windeployqt.exe")
+
     install(CODE "
-        include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/qt_client_app.exe\" \"\" \"$<TARGET_FILE_DIR:qt_client_app>\")
+        execute_process(
+            COMMAND \"${WINDEPLOYQT_EXECUTABLE}\" 
+                    \"$<TARGET_FILE:qt_client_app>\"
+                    --dir \"$<TARGET_FILE_DIR:qt_client_app>\"
+                    --qmldir \"${CMAKE_CURRENT_SOURCE_DIR}/qml\"
+        )
     " COMPONENT qt_client)
+
 endif()
