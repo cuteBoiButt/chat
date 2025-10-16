@@ -68,8 +68,8 @@ if(WIN32)
     install(CODE "
         execute_process(
             COMMAND \"${WINDEPLOYQT_EXECUTABLE}\" 
-                    \"$<TARGET_FILE:qt_client_app>\"
-                    --dir \"$<TARGET_FILE_DIR:qt_client_app>\"
+                    \"${CMAKE_INSTALL_PREFIX}/qt_client_app.exe\"
+                    --dir \"${CMAKE_INSTALL_PREFIX}\"
                     --qmldir \"${CMAKE_CURRENT_SOURCE_DIR}/qml\"
         )
     " COMPONENT qt_client)
