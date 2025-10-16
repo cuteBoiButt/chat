@@ -71,10 +71,10 @@ RUN /root/.local/bin/aqt install-qt linux desktop ${QT_VERSION} linux_${QT_ARCH}
 # Set Qt environment variables
 ENV Qt6_DIR=/opt/Qt/${QT_VERSION}/${QT_ARCH}
 #ENV PATH="${Qt6_DIR}/bin:${PATH}"
-#ENV LD_LIBRARY_PATH="${Qt6_DIR}/lib:${LD_LIBRARY_PATH}"
-#ENV PKG_CONFIG_PATH="${Qt6_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
+ENV LD_LIBRARY_PATH="${Qt6_DIR}/lib:${LD_LIBRARY_PATH}"
+ENV PKG_CONFIG_PATH="${Qt6_DIR}/lib/pkgconfig:${PKG_CONFIG_PATH}"
 ENV QT_PLUGIN_PATH="${Qt6_DIR}/plugins"
-ENV QML_IMPORT_PATH="${Qt6_DIR}/qml"
+ENV QML2_IMPORT_PATH="${Qt6_DIR}/qml"
 
 # Copy vcpkg binary cache
 COPY --chown=vscode:vscode --from=builder /workspace/vcpkg-archives /home/vscode/.cache/vcpkg/archives
