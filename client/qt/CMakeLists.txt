@@ -83,6 +83,19 @@ elseif(APPLE)
     )
     install(TARGETS qt_client_app BUNDLE DESTINATION . COMPONENT qt_client)
 
+    get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" DIRECTORY)
+    set(MACDEPLOYQT_EXECUTABLE "${QT_BIN_DIR}/macdeployqt")
+
+    install(CODE "
+        execute_process(
+            COMMAND \"${MACDEPLOYQT_EXECUTABLE}\" 
+                    \"\${CMAKE_INSTALL_PREFIX}/qt_client_app.app\"
+                    -always-overwrite
+                    -qmldir \"${CMAKE_CURRENT_SOURCE_DIR}/qml\"
+        )
+    " COMPONENT qt_client)
+
 else()
 
     install(
