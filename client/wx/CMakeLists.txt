@@ -80,7 +80,7 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME "${CPACK_PACKAGE_NAME}"
 
         # Sets CFBundleIdentifier. This must be a unique string.
-        MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourname.slightlyprettychat"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourname.slightlyprettychat.wx"
 
         # Sets CFBundleVersion from the top-level CPack variable
         MACOSX_BUNDLE_BUNDLE_VERSION "${CPACK_PACKAGE_VERSION}"

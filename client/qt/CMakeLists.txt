@@ -48,17 +48,6 @@ target_link_libraries(qt_client_app PRIVATE
         Qt6::Widgets
 )
 
-install(
-    TARGETS qt_client_app
-    DESTINATION .
-    COMPONENT qt_client
-)
-install(
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qml/
-    DESTINATION qml
-    COMPONENT qt_client
-)
-
 if(WIN32)
     # Find windeployqt
     get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
@@ -73,5 +62,38 @@ if(WIN32)
                     --qmldir \"${CMAKE_CURRENT_SOURCE_DIR}/qml\"
         )
     " COMPONENT qt_client)
+
+elseif(APPLE)
+    # This creates the .app structure and automatically includes the
+    # resources
+    set_target_properties(qt_client_app PROPERTIES
+        MACOSX_BUNDLE TRUE
+
+        # Sets CFBundleName from the top-level CPack variable
+        MACOSX_BUNDLE_BUNDLE_NAME "${CPACK_PACKAGE_NAME}"
+
+        # Sets CFBundleIdentifier. This must be a unique string.
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourname.slightlyprettychat.qt"
+
+        # Sets CFBundleVersion from the top-level CPack variable
+        MACOSX_BUNDLE_BUNDLE_VERSION "${CPACK_PACKAGE_VERSION}"
+
+        # Sets CFBundleShortVersionString from the top-level CPack variable
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}"
+    )
+    install(TARGETS qt_client_app BUNDLE DESTINATION . COMPONENT qt_client)
+
+else()
+
+    install(
+        TARGETS qt_client_app
+        DESTINATION .
+        COMPONENT qt_client
+    )
+    install(
+        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qml/
+        DESTINATION qml
+        COMPONENT qt_client
+    )
 
 endif()
