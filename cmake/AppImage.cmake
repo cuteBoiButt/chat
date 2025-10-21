@@ -16,13 +16,14 @@ include(CMakeParseArguments)
 #     EXECUTABLE_NAME <exec_name>     # The main executable in the component for the .desktop file
 #     [PLUGIN_TYPE <qt|gtk>]          # The linuxdeploy plugin to use (default: qt)
 #     [QML_SOURCES_PATHS <path>]      # Optional path to QML sources for Qt apps
+#     [EXTRA_ENV_VARS <var1> <var2>...] # Optional list of "KEY=VALUE" environment variables
 # )
 #]]
 function(add_appimage_from_component)
     # 1. Define and parse the function's arguments
     set(options "")
     set(one_value_keywords COMPONENT_NAME DISPLAY_NAME EXECUTABLE_NAME PLUGIN_TYPE QML_SOURCES_PATHS)
-    set(multi_value_keywords "")
+    set(multi_value_keywords EXTRA_ENV_VARS)
     cmake_parse_arguments(ARG "${options}" "${one_value_keywords}" "${multi_value_keywords}" ${ARGN})
 
     # Validate required arguments
@@ -50,7 +51,7 @@ function(add_appimage_from_component)
     set(appimage_full_path "${CMAKE_BINARY_DIR}/${appimage_file_name}")
 
     set(custom_target_name "create_appimage_${ARG_COMPONENT_NAME}")
-    set(package_component_name "${ARG_COMPONENT_NAME}_package") # Component for the final .AppImage file
+    set(package_component_name "${ARG_COMPONENT_NAME}_package")
 
     # 3. Define the command that generates the AppImage file
     set(linuxdeploy_args
@@ -59,11 +60,23 @@ function(add_appimage_from_component)
         -DEXECUTABLE_NAME=${ARG_EXECUTABLE_NAME}
         -DPLUGIN_TYPE=${ARG_PLUGIN_TYPE}
         -DCMAKE_CURRENT_BINARY_DIR=${CMAKE_BINARY_DIR}
-        -P ${CMAKE_SOURCE_DIR}/cmake/LinuxDeployAppImage.cmake
     )
     if(DEFINED ARG_QML_SOURCES_PATHS)
         list(APPEND linuxdeploy_args "-DQML_SOURCES_PATHS=${ARG_QML_SOURCES_PATHS}")
     endif()
+
+    if(ARG_EXTRA_ENV_VARS)
+        string(JOIN ";" env_vars_string "${ARG_EXTRA_ENV_VARS}")
+        string(REPLACE ";" "\\;" env_vars_string "${env_vars_string}")
+        list(APPEND linuxdeploy_args "-DEXTRA_ENV_VARS:STRING=\"${env_vars_string}\"")
+    endif()
+
+    list(APPEND linuxdeploy_args "-P" "${CMAKE_SOURCE_DIR}/cmake/LinuxDeployAppImage.cmake")
+
+    message(STATUS "[DEBUG AppImage.cmake] Arguments list being passed to add_custom_command:")
+    foreach(arg IN LISTS linuxdeploy_args)
+        message(STATUS "    ${arg}")
+    endforeach()
 
     add_custom_command(
         OUTPUT "${appimage_full_path}"
@@ -71,7 +84,6 @@ function(add_appimage_from_component)
         DEPENDS ${ARG_EXECUTABLE_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Defining how to generate AppImage for component '${ARG_COMPONENT_NAME}'"
-        VERBATIM
     )
 
     # Create a unique custom target to trigger the command
@@ -91,6 +103,7 @@ function(add_appimage_from_component)
         "
         COMPONENT ${package_component_name}
     )
+
     install(
         FILES "${appimage_full_path}"
         DESTINATION .

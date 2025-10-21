@@ -153,12 +153,9 @@ endif()
 
 # Prepare environment: add LINUXDEPLOY_DIR to PATH so plugins can be found
 set(LINUXDEPLOY_ENV "PATH=${LINUXDEPLOY_DIR}:$ENV{PATH}")
-if(DEFINED EXTRA_ENV_VARS)
-    # EXTRA_ENV_VARS should be a semicolon-separated list like "VAR1=value1;VAR2=value2"
-    foreach(ENV_VAR ${EXTRA_ENV_VARS})
-        list(APPEND LINUXDEPLOY_ENV "${ENV_VAR}")
-    endforeach()
-endif()
+foreach(ENV_VAR ${EXTRA_ENV_VARS})
+    list(APPEND LINUXDEPLOY_ENV "${ENV_VAR}")
+endforeach()
 
 # Run linuxdeploy
 message(STATUS "Running linuxdeploy for ${COMPONENT_NAME}...")
