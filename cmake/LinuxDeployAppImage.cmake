@@ -1,6 +1,8 @@
 # cmake/LinuxDeployAppImage.cmake
 # This script runs during CPack to create AppImages
 
+message(STATUS "[DEBUG LinuxDeployAppImage.cmake] Received EXTRA_ENV_VARS = [${EXTRA_ENV_VARS}]")
+
 if(NOT DEFINED COMPONENT_NAME)
     message(FATAL_ERROR "COMPONENT_NAME must be defined")
 endif()
@@ -133,12 +135,6 @@ if(PLUGIN_TYPE STREQUAL "qt")
         "linuxdeploy-plugin-qt-x86_64.AppImage"
         "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20250213-1/linuxdeploy-plugin-qt-x86_64.AppImage"
     )
-
-    # Set QML_SOURCES_PATHS if provided
-    if(DEFINED QML_SOURCES_PATHS)
-        set(ENV{QML_SOURCES_PATHS} "${QML_SOURCES_PATHS}")
-        message(STATUS "QML_SOURCES_PATHS set to: ${QML_SOURCES_PATHS}")
-    endif()
 elseif(PLUGIN_TYPE STREQUAL "gtk")
     ensure_shell_script(
         "linuxdeploy-plugin-gtk.sh"
@@ -153,8 +149,19 @@ endif()
 
 # Prepare environment: add LINUXDEPLOY_DIR to PATH so plugins can be found
 set(LINUXDEPLOY_ENV "PATH=${LINUXDEPLOY_DIR}:$ENV{PATH}")
-foreach(ENV_VAR ${EXTRA_ENV_VARS})
-    list(APPEND LINUXDEPLOY_ENV "${ENV_VAR}")
+
+# Parse EXTRA_ENV_VARS if provided (split by our custom delimiter)
+if(DEFINED EXTRA_ENV_VARS AND NOT EXTRA_ENV_VARS STREQUAL "")
+    foreach(ENV_VAR IN LISTS EXTRA_ENV_VARS)
+        string(REPLACE "<SEMICOLON>" "\\;" ENV_VAR "${ENV_VAR}")
+        message(STATUS "[DEBUG] Adding env var: ${ENV_VAR}")
+        list(APPEND LINUXDEPLOY_ENV "${ENV_VAR}")
+    endforeach()
+endif()
+
+message(STATUS "[DEBUG] Final LINUXDEPLOY_ENV list:")
+foreach(ENV_VAR IN LISTS LINUXDEPLOY_ENV)
+    message(STATUS "    ${ENV_VAR}")
 endforeach()
 
 # Run linuxdeploy

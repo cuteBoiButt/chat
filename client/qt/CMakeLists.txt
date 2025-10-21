@@ -113,7 +113,7 @@ else() # LINUX
         PLUGIN_TYPE qt
         EXTRA_ENV_VARS
             "QML_SOURCES_PATHS=${CMAKE_CURRENT_SOURCE_DIR}/qml"
-            "EXTRA_QT_PLUGINS=waylandcompositor"
+            "EXTRA_QT_PLUGINS=waylandcompositor<SEMICOLON>qml"
             "EXTRA_PLATFORM_PLUGINS=libqwayland.so"
     )
 endif()
