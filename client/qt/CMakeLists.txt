@@ -110,9 +110,9 @@ else() # LINUX
         COMPONENT_NAME "qt_client"
         DISPLAY_NAME "Slightly Pretty Chat Qt"
         EXECUTABLE_NAME "qt_client_app"
-        QML_SOURCES_PATHS "${CMAKE_SOURCE_DIR}/qml"
         PLUGIN_TYPE qt
         EXTRA_ENV_VARS
+            "QML_SOURCES_PATHS=${CMAKE_CURRENT_SOURCE_DIR}/qml"
             "EXTRA_QT_PLUGINS=waylandcompositor"
             "EXTRA_PLATFORM_PLUGINS=libqwayland.so"
     )

@@ -15,14 +15,13 @@ include(CMakeParseArguments)
 #     DISPLAY_NAME "<display_name>"   # The user-facing name for the app
 #     EXECUTABLE_NAME <exec_name>     # The main executable in the component for the .desktop file
 #     [PLUGIN_TYPE <qt|gtk>]          # The linuxdeploy plugin to use (default: qt)
-#     [QML_SOURCES_PATHS <path>]      # Optional path to QML sources for Qt apps
 #     [EXTRA_ENV_VARS <var1> <var2>...] # Optional list of "KEY=VALUE" environment variables
 # )
 #]]
 function(add_appimage_from_component)
     # 1. Define and parse the function's arguments
     set(options "")
-    set(one_value_keywords COMPONENT_NAME DISPLAY_NAME EXECUTABLE_NAME PLUGIN_TYPE QML_SOURCES_PATHS)
+    set(one_value_keywords COMPONENT_NAME DISPLAY_NAME EXECUTABLE_NAME PLUGIN_TYPE)
     set(multi_value_keywords EXTRA_ENV_VARS)
     cmake_parse_arguments(ARG "${options}" "${one_value_keywords}" "${multi_value_keywords}" ${ARGN})
 
@@ -61,9 +60,6 @@ function(add_appimage_from_component)
         -DPLUGIN_TYPE=${ARG_PLUGIN_TYPE}
         -DCMAKE_CURRENT_BINARY_DIR=${CMAKE_BINARY_DIR}
     )
-    if(DEFINED ARG_QML_SOURCES_PATHS)
-        list(APPEND linuxdeploy_args "-DQML_SOURCES_PATHS=${ARG_QML_SOURCES_PATHS}")
-    endif()
 
     if(ARG_EXTRA_ENV_VARS)
         string(JOIN ";" env_vars_string "${ARG_EXTRA_ENV_VARS}")
