@@ -94,6 +94,7 @@ elseif(APPLE)
                     \"\${CMAKE_INSTALL_PREFIX}/qt_client_app.app\"
                     -always-overwrite
                     -qmldir=${CMAKE_CURRENT_SOURCE_DIR}/qml
+                    -verbose=1
         )
     " COMPONENT qt_client)
 
