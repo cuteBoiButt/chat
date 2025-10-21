@@ -84,7 +84,7 @@ jobs:
         with:
           version: '6.10.0'
           arch: ${{ runner.os == 'Windows' && 'win64_msvc2022_64' || '' }}
-          modules: "qtgrpc qtwebsockets"
+          modules: "qtgrpc qtwebsockets qtscxml"
           cache: true
 
       - name: Install required Python packages
