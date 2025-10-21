@@ -69,7 +69,7 @@ ARG QT_ARCH=gcc_64
 
 # Install Qt
 RUN /root/.local/bin/aqt install-qt linux desktop ${QT_VERSION} linux_${QT_ARCH} \
-    --outputdir /opt/Qt
+    -m qtgrpc qtwebsockets --outputdir /opt/Qt
 
 # Set Qt environment variables
 ENV Qt6_DIR=/opt/Qt/${QT_VERSION}/${QT_ARCH}
