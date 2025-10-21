@@ -88,7 +88,7 @@ elseif(APPLE)
 else() # Linux
     set(CPACK_GENERATOR "TGZ")
     set(CPACK_PACKAGE_FILENAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-linux-x64")
-    set(CPACK_COMPONENTS_ALL server aggregator)
+    set(CPACK_COMPONENTS_ALL server aggregator wx_client_package qt_client_package)
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 endif()
 

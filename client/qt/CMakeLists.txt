@@ -97,17 +97,20 @@ elseif(APPLE)
         )
     " COMPONENT qt_client)
 
-else()
+else() # LINUX
+    include(${CMAKE_SOURCE_DIR}/cmake/AppImage.cmake)
 
     install(
         TARGETS qt_client_app
         DESTINATION .
-        COMPONENT qt_client
-    )
-    install(
-        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qml/
-        DESTINATION qml
-        COMPONENT qt_client
+        COMPONENT qt_client # This component contains the files needed for the AppImage
     )
 
+    add_appimage_from_component(
+        COMPONENT_NAME "qt_client"
+        DISPLAY_NAME "Slightly Pretty Chat Qt"
+        EXECUTABLE_NAME "qt_client_app"
+        QML_SOURCES_PATHS "${CMAKE_SOURCE_DIR}/qml"
+        PLUGIN_TYPE qt
+    )
 endif()

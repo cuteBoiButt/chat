@@ -108,3 +108,14 @@ if(WIN32)
         fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/wx_client_app.exe\" \"\" \"$<TARGET_FILE_DIR:wx_client_app>\")
     " COMPONENT wx_client)
 endif()
+
+if(LINUX) 
+    include(${CMAKE_SOURCE_DIR}/cmake/AppImage.cmake)
+
+    add_appimage_from_component(
+        COMPONENT_NAME "wx_client"
+        DISPLAY_NAME "Slightly Pretty Chat Wx"
+        EXECUTABLE_NAME "wx_client_app"
+        PLUGIN_TYPE gtk
+    )
+endif()
