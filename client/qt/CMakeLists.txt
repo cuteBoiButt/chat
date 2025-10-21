@@ -54,6 +54,12 @@ if(WIN32)
     get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" DIRECTORY)
     set(WINDEPLOYQT_EXECUTABLE "${QT_BIN_DIR}/windeployqt.exe")
 
+    install(
+        TARGETS qt_client_app
+        DESTINATION .
+        COMPONENT qt_client
+    )
+
     install(CODE "
         execute_process(
             COMMAND \"${WINDEPLOYQT_EXECUTABLE}\" 
